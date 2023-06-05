@@ -1,0 +1,524 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define MAX_FABRICANTES 5
+#define MAX_PRODUTOS 50
+#define MAX_UF 3
+
+typedef struct {
+    char marca[50];
+    char site[100];
+    char telefone[20];
+    char UF[MAX_UF];
+} Fabricante;
+
+typedef struct {
+    char descricao[100];
+    float peso;
+    float valorCompra;
+    float valorVenda;
+    float valorLucro;
+    float percentualLucro;
+    Fabricante fabricante;
+} Produto;
+void cadastrarFabricante(Fabricante *fabricantes, int *numFabricantes) {
+    if (*numFabricantes >= MAX_FABRICANTES) {
+        printf("Limite de fabricantes atingido.\n");
+        return;
+    }
+
+    Fabricante novoFabricante;
+
+    printf("\n=== Cadastro de Fabricante ===\n");
+    printf("Marca: ");
+    scanf("%s", novoFabricante.marca);
+
+    printf("Site: ");
+    scanf("%s", novoFabricante.site);
+
+    printf("Telefone: ");
+    scanf("%s", novoFabricante.telefone);
+
+    printf("UF: ");
+    scanf("%s", novoFabricante.UF);
+
+    fabricantes[*numFabricantes] = novoFabricante;
+    (*numFabricantes)++;
+
+    printf("Fabricante cadastrado com sucesso.\n");
+}
+
+void cadastrarProduto(Produto *produtos, int *numProdutos, Fabricante *fabricantes, int numFabricantes) {
+    if (*numProdutos >= MAX_PRODUTOS) {
+        printf("Limite de produtos atingido.\n");
+        return;
+    }
+
+    Produto novoProduto;
+
+    printf("\n=== Cadastro de Produto ===\n");
+    printf("Descricao: ");
+    scanf("%s", novoProduto.descricao);
+
+    printf("Peso: ");
+    scanf("%f", &novoProduto.peso);
+
+    printf("Valor de Compra: ");
+    scanf("%f", &novoProduto.valorCompra);
+
+    printf("Valor de Venda: ");
+    scanf("%f", &novoProduto.valorVenda);
+
+    printf("Fabricante :\n");
+    int i; 
+    for (i = 0; i < numFabricantes; i++) {
+        printf("%d. %s\n", i+1, fabricantes[i].marca);
+    }
+    int fabricanteIndex;
+    scanf("%d", &fabricanteIndex);
+    if (fabricanteIndex < 1 || fabricanteIndex > numFabricantes) {
+        printf("indice de fabricante\n");
+        return;
+    }
+    novoProduto.fabricante = fabricantes[fabricanteIndex - 1];
+
+    novoProduto.valorLucro = novoProduto.valorVenda - novoProduto.valorCompra;
+    novoProduto.percentualLucro = (novoProduto.valorLucro / novoProduto.valorCompra) * 100;
+
+    produtos[*numProdutos] = novoProduto;
+    (*numProdutos)++;
+
+    printf("Produto cadastrado com sucesso.\n");
+}
+
+void relatorioProdutos(Produto *produtos, int numProdutos) {
+    printf("\n=== Relatório de Produtos ===\n");
+    int i;
+    for (i = 0; i < numProdutos; i++) {
+        Produto produto = produtos[i];
+        printf("Produto %d:\n", i + 1);
+        printf("Descrição: %s\n", produto.descricao);
+        printf("Peso: %.2f\n", produto.peso);
+        printf("Valor de Compra: %.2f\n", produto.valorCompra);
+        printf("Valor de Venda: %.2f\n", produto.valorVenda);
+        printf("Valor do Lucro: %.2f\n", produto.valorLucro);
+        printf("Percentual de Lucro: %.2f%%\n", produto.percentualLucro);
+        printf("Fabricante: %s\n", produto.fabricante.marca);
+        printf("Site do Fabricante: %s\n", produto.fabricante.site);
+        printf("Telefone do Fabricante: %s\n", produto.fabricante.telefone);
+        printf("UF do Fabricante: %s\n", produto.fabricante.UF);
+        printf("\n");
+    }
+}
+
+void relatorioFabricantes(Fabricante *fabricantes, int numFabricantes) {
+    printf("\n=== Relatório de Fabricantes ===\n");
+    int i;
+    for (i = 0; i < numFabricantes; i++) {
+        Fabricante fabricante = fabricantes[i];
+        printf("Fabricante %d:\n", i + 1);
+        printf("Marca: %s\n", fabricante.marca);
+        printf("Site: %s\n", fabricante.site);
+        printf("Telefone: %s\n", fabricante.telefone);
+        printf("UF: %s\n", fabricante.UF);
+        printf("\n");
+    }
+}
+int main() {
+    Fabricante fabricantes[MAX_FABRICANTES];
+    int numFabricantes = 0;
+
+    Produto produtos[MAX_PRODUTOS];
+    int numProdutos = 0;
+
+    int opcao;
+
+    do {
+        printf("\n=== Menu ===\n");
+        printf("1. Cadastrar Fabricante\n");
+        printf("2. Cadastrar Produto\n");
+        printf("3. Relatorio de Produtos\n");
+        printf("4. Relatorio de Fabricantes\n");
+        printf("0. Outros Relatorios\n");
+
+        printf("Escolha uma opcao: ");
+        scanf("%d", &opcao);
+
+        switch (opcao) {
+            case 1:
+                cadastrarFabricante(fabricantes, &numFabricantes);
+                break;
+            case 2:
+                cadastrarProduto(produtos, &numProdutos, fabricantes, numFabricantes);
+                break;
+            case 3:
+                relatorioProdutos(produtos, numProdutos);
+                break;
+            case 4:
+                relatorioFabricantes(fabricantes, numFabricantes);
+                break;
+            case 0:
+                printf("Encerrando o programa.\n");
+                break;
+            default:
+                printf("Opcao invalida.\n");
+        }
+    } while (opcao != 0);
+
+
+int validarUF(const char *uf) {
+    const char *unidadesFederativas[] = {
+        "AC", "AL", "AP", "AM", "BA", "CE", "DF", "ES", "GO", "MA", "MT", "MS", "MG", "PA", "PB", "PR",
+        "PE", "PI", "RJ", "RN", "RS", "RO", "RR", "SC", "SP", "SE", "TO"
+    };
+    int numUFs = sizeof(unidadesFederativas) / sizeof(unidadesFederativas[0]);
+	int i;
+    for (i = 0; i < numUFs; i++) {
+        if (strcmp(uf, unidadesFederativas[i]) == 0) {
+            return 1;
+        }
+    }
+    return 0;
+}
+
+void limparBuffer() {
+    int c;
+    while ((c = getchar()) != '\n' && c != EOF) {}
+}
+
+int leValidaInteiro(const char *mensagem, int min, int max) {
+    int valor;
+    while (1) {
+        printf("%s", mensagem);
+        if (scanf("%d", &valor) == 1 && valor >= min && valor <= max) {
+            limparBuffer();
+            return valor;
+        }
+        limparBuffer();
+        printf("Valor inválido. Digite um número entre %d e %d.\n", min, max);
+    }
+}
+
+float leValidaFloat(const char *mensagem, float min, float max) {
+    float valor;
+    while (1) {
+        printf("%s", mensagem);
+        if (scanf("%f", &valor) == 1 && valor >= min && valor <= max) {
+            limparBuffer();
+            return valor;
+        }
+        limparBuffer();
+        printf("Valor inválido. Digite um número entre %.2f e %.2f.\n", min, max);
+    }
+}
+
+void cadastrarFabricante(Fabricante *fabricantes, int *numFabricantes) {
+    if (*numFabricantes >= MAX_FABRICANTES) {
+        printf("Limite de fabricantes atingido.\n");
+        return;
+    }
+
+    Fabricante novoFabricante;
+
+    printf("\n=== Cadastro de Fabricante ===\n");
+    printf("Marca: ");
+    fgets(novoFabricante.marca, sizeof(novoFabricante.marca), stdin);
+    novoFabricante.marca[strcspn(novoFabricante.marca, "\n")] = '\0';
+
+    printf("Site: ");
+    fgets(novoFabricante.site, sizeof(novoFabricante.site), stdin);
+    novoFabricante.site[strcspn(novoFabricante.site, "\n")] = '\0';
+
+    printf("Telefone: ");
+    fgets(novoFabricante.telefone, sizeof(novoFabricante.telefone), stdin);
+    novoFabricante.telefone[strcspn(novoFabricante.telefone, "\n")] = '\0';
+
+    while (1) {
+        printf("UF (AC, AL, AP, AM, ..., TO): ");
+        fgets(novoFabricante.UF, sizeof(novoFabricante.UF), stdin);
+        novoFabricante.UF[strcspn(novoFabricante.UF, "\n")] = '\0';
+
+        if (validarUF(novoFabricante.UF)) {
+            break;
+        }
+        printf("UF inválida. Digite uma sigla válida.\n");
+    }
+
+    fabricantes[*numFabricantes] = novoFabricante;
+    (*numFabricantes)++;
+
+    printf("Fabricante cadastrado com sucesso.\n");
+}
+
+void cadastrarProduto(Produto *produtos, int *numProdutos, Fabricante *fabricantes, int numFabricantes) {
+    if (*numProdutos >= MAX_PRODUTOS) {
+        printf("Limite de produtos atingido.\n");
+        return;
+    }
+
+    Produto novoProduto;
+
+    printf("\n=== Cadastro de Produto ===\n");
+    printf("Descrição: ");
+    fgets(novoProduto.descricao, sizeof(novoProduto.descricao), stdin);
+    novoProduto.descricao[strcspn(novoProduto.descricao, "\n")] = '\0';
+
+    novoProduto.peso = leValidaFloat("Peso: ", 0.01, 99999.99);
+    novoProduto.valorCompra = leValidaFloat("Valor de Compra: ", 0.01, 99999.99);
+    novoProduto.valorVenda = leValidaFloat("Valor de Venda: ", 0.01, 99999.99);
+
+    printf("Fabricante (Digite o número correspondente):\n");
+    int i;
+    for (i = 0; i < numFabricantes; i++) {
+        printf("%d. %s\n", i + 1, fabricantes[i].marca);
+    }
+    int fabricanteIndex = leValidaInteiro("", 1, numFabricantes);
+    novoProduto.fabricante = fabricantes[fabricanteIndex - 1];
+
+    novoProduto.valorLucro = novoProduto.valorVenda - novoProduto.valorCompra;
+    novoProduto.percentualLucro = (novoProduto.valorLucro / novoProduto.valorCompra) * 100;
+
+    produtos[*numProdutos] = novoProduto;
+    (*numProdutos)++;
+
+    printf("Produto cadastrado com sucesso.\n");
+}
+
+void listarMarcas(Fabricante *fabricantes, int numFabricantes) {
+    printf("\n=== Marcas Cadastradas ===\n");
+    printf("ID\tMarca\n");
+    int i;
+    for (i = 0; i < numFabricantes; i++) {
+        printf("%d\t%s\n", i + 1, fabricantes[i].marca);
+    }
+    printf("\n");
+}
+
+void listarProdutos(Produto *produtos, int numProdutos) {
+    printf("\n=== Produtos Cadastrados ===\n");
+    printf("ID\tDescrição\tPeso\tValor Compra\tValor Venda\tValor Lucro\t%% Lucro\tFabricante\n");
+    int i;
+    for (i = 0; i < numProdutos; i++) {
+        Produto produto = produtos[i];
+        printf("%d\t%s\t%.2f\t%.2f\t\t%.2f\t\t%.2f\t\t%.2f\t\t%s\n", i + 1, produto.descricao, produto.peso,
+            produto.valorCompra, produto.valorVenda, produto.valorLucro, produto.percentualLucro,
+            produto.fabricante.marca);
+    }
+    printf("\n");
+}
+
+void listarProdutosEstado(Produto *produtos, int numProdutos, const char *estado) {
+    printf("\n=== Produtos Cadastrados no Estado %s ===\n", estado);
+    printf("ID\tDescrição\tPeso\tValor Compra\tValor Venda\tValor Lucro\t%% Lucro\tFabricante\n");
+    int i;
+    for (i = 0; i < numProdutos; i++) {
+        Produto produto = produtos[i];
+        if (strcmp(produto.fabricante.UF, estado) == 0) {
+            printf("%d\t%s\t%.2f\t%.2f\t\t%.2f\t\t%.2f\t\t%.2f\t\t%s\n", i + 1, produto.descricao, produto.peso,
+                produto.valorCompra, produto.valorVenda, produto.valorLucro, produto.percentualLucro,
+                produto.fabricante.marca);
+            i = 1;
+        }
+    }
+    if (!i) {
+        printf("Nenhum produto encontrado.\n");
+    }
+    printf("\n");
+}
+
+void listarProdutosMarca(Produto *produtos, int numProdutos, const char *marca) {
+    printf("\n=== Produtos Cadastrados da Marca %s ===\n", marca);
+    printf("ID\tDescrição\tPeso\tValor Compra\tValor Venda\tValor Lucro\t%% Lucro\tFabricante\n");
+    int i;
+    for (i = 0; i < numProdutos; i++) {
+        Produto produto = produtos[i];
+        if (strcmp(produto.fabricante.marca, marca) == 0) {
+            printf("%d\t%s\t%.2f\t%.2f\t\t%.2f\t\t%.2f\t\t%.2f\t\t%s\n", i + 1, produto.descricao, produto.peso,
+                produto.valorCompra, produto.valorVenda, produto.valorLucro, produto.percentualLucro,
+                produto.fabricante.marca);
+           i = 1;
+        }
+    }
+    if (!i) {
+        printf("Nenhum produto encontrado.\n");
+    }
+    printf("\n");
+}
+
+void listarEstadoProdutoMaisCaro(Produto *produtos, int numProdutos) {
+    printf("\n=== Estado(s) com o Produto mais Caro ===\n");
+    float maiorValor = 0.0;
+    int i;
+    for (i = 0; i < numProdutos; i++) {
+        Produto produto = produtos[i];
+        if (produto.valorVenda > maiorValor) {
+            maiorValor = produto.valorVenda;
+        }
+    }
+    for (i = 0; i < numProdutos; i++) {
+        Produto produto = produtos[i];
+        if (produto.valorVenda == maiorValor) {
+            printf("%s\n", produto.fabricante.UF);
+            i = 1;
+        }
+    }
+    if (!i) {
+        printf("Nenhum produto encontrado.\n");
+    }
+    printf("\n");
+}
+
+void listarEstadoProdutoMaisBarato(Produto *produtos, int numProdutos) {
+    printf("\n=== Estado(s) com o Produto mais Barato ===\n");
+    float menorValor = produtos[0].valorVenda;
+    int i;
+    for (i = 1; i < numProdutos; i++) {
+        Produto produto = produtos[i];
+        if (produto.valorVenda < menorValor) {
+            menorValor = produto.valorVenda;
+        }
+    }
+    for (i = 0; i < numProdutos; i++) {
+        Produto produto = produtos[i];
+        if (produto.valorVenda == menorValor) {
+            printf("%s\n", produto.fabricante.UF);
+            i = 1;
+        }
+    }
+    if (!i) {
+        printf("Nenhum produto encontrado.\n");
+    }
+    printf("\n");
+}
+
+int compararValor(const void *a, const void *b) {
+    const Produto *produtoA = (const Produto *)a;
+    const Produto *produtoB = (const Produto *)b;
+
+    return (int)(produtoA->valorVenda - produtoB->valorVenda);
+}
+
+int compararValorLucro(const void *a, const void *b) {
+    const Produto *produtoA = (const Produto *)a;
+    const Produto *produtoB = (const Produto *)b;
+
+    return (int)(produtoA->valorLucro - produtoB->valorLucro);
+}
+
+int compararPercentualLucro(const void *a, const void *b) {
+    const Produto *produtoA = (const Produto *)a;
+    const Produto *produtoB = (const Produto *)b;
+
+    return (int)(produtoA->percentualLucro - produtoB->percentualLucro);
+}
+
+void listarProdutosOrdemCrescenteValor(Produto *produtos, int numProdutos) {
+    printf("\n=== Produtos em Ordem Crescente de Valor ===\n");
+    printf("ID\tDescrição\tPeso\tValor Compra\tValor Venda\tValor Lucro\t%% Lucro\tFabricante\n");
+
+    qsort(produtos, numProdutos, sizeof(Produto), compararValor);
+	int i;
+    for (i = 0; i < numProdutos; i++) {
+        Produto produto = produtos[i];
+        printf("%d\t%s\t%.2f\t%.2f\t\t%.2f\t\t%.2f\t\t%.2f\t\t%s\n", i + 1, produto.descricao, produto.peso,
+            produto.valorCompra, produto.valorVenda, produto.valorLucro, produto.percentualLucro,
+            produto.fabricante.marca);
+    }
+    printf("\n");
+}
+
+void listarProdutosOrdemCrescenteValorLucro(Produto *produtos, int numProdutos) {
+    printf("\n=== Produtos em Ordem Crescente de Valor do Lucro ===\n");
+    printf("ID\tDescrição\tPeso\tValor Compra\tValor Venda\tValor Lucro\t%% Lucro\tFabricante\n");
+
+    qsort(produtos, numProdutos, sizeof(Produto), compararValorLucro);
+	int i;
+    for (i = 0; i < numProdutos; i++) {
+        Produto produto = produtos[i];
+        printf("%d\t%s\t%.2f\t%.2f\t\t%.2f\t\t%.2f\t\t%.2f\t\t%s\n", i + 1, produto.descricao, produto.peso,
+            produto.valorCompra, produto.valorVenda, produto.valorLucro, produto.percentualLucro,
+            produto.fabricante.marca);
+    }
+    printf("\n");
+}
+
+void listarProdutosOrdemCrescentePercentualLucro(Produto *produtos, int numProdutos) {
+    printf("\n=== Produtos em Ordem Crescente de Percentual de Lucro ===\n");
+    printf("ID\tDescrição\tPeso\tValor Compra\tValor Venda\tValor Lucro\t%% Lucro\tFabricante\n");
+
+    qsort(produtos, numProdutos, sizeof(Produto), compararPercentualLucro);
+	int i;
+    for (i = 0; i < numProdutos; i++) {
+        Produto produto = produtos[i];
+        printf("%d\t%s\t%.2f\t%.2f\t\t%.2f\t\t%.2f\t\t%.2f\t\t%s\n", i + 1, produto.descricao, produto.peso,
+            produto.valorCompra, produto.valorVenda, produto.valorLucro, produto.percentualLucro,
+            produto.fabricante.marca);
+    }
+    printf("\n");
+}
+
+
+    fabricantes[MAX_FABRICANTES];
+    
+
+    while (1) {
+        printf("=== Menu ===\n");
+        printf("[1] Listar todas as marcas\n");
+        printf("[2] Listar todos os produtos\n");
+        printf("[3] Listar os produtos de um determinado estado\n");
+        printf("[4] Listar os produtos de uma determinada marca\n");
+        printf("[5] Apresentar o(s) estado(s) onde está registrado o produto mais caro\n");
+        printf("[6] Apresentar o(s) estado(s) onde está registrado o produto mais barato\n");
+        printf("[7] Listar todos os produtos em ordem crescente de valor\n");
+        printf("[8] Listar todos os produtos em ordem crescente de maior \"valor do lucro\"\n");
+        printf("[9] Listar todos os produtos em ordem crescente de maior \"percentual do lucro\"\n");
+        printf("[0] Sair\n");
+
+        opcao = leValidaInteiro("Digite uma opção: ", 0, 9);
+
+        switch (opcao) {
+            case 1:
+                listarMarcas(fabricantes, numFabricantes);
+                break;
+            case 2:
+                listarProdutos(produtos, numProdutos);
+                break;
+            case 3: {
+                char estado[3];
+                printf("Digite o estado (UF): ");
+                fgets(estado, sizeof(estado), stdin);
+                estado[strcspn(estado, "\n")] = '\0';
+                listarProdutosEstado(produtos, numProdutos, estado);
+                break;
+            }
+            case 4: {
+                char marca[4];
+                printf("Digite a marca: ");
+                fgets(marca, sizeof(marca), stdin);
+                marca[strcspn(marca, "\n")] = '\0';
+                listarProdutosMarca(produtos, numProdutos, marca);
+                break;
+            }
+            case 5:
+                listarEstadoProdutoMaisCaro(produtos, numProdutos);
+                break;
+            case 6:
+                listarEstadoProdutoMaisBarato(produtos, numProdutos);
+                break;
+            case 7:
+                listarProdutosOrdemCrescenteValor(produtos, numProdutos);
+                break;
+            case 8:
+                listarProdutosOrdemCrescenteValorLucro(produtos, numProdutos);
+                break;
+            case 9:
+                listarProdutosOrdemCrescentePercentualLucro(produtos, numProdutos);
+                break;
+            case 0:
+                return 0;
+        }
+    }
+
+    return 0;
+}
